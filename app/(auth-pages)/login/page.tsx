@@ -20,11 +20,11 @@ export default function LoginPage() {
           name="password"
           placeholder="Password"
           required
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-full p-2  text-black border border-gray-300 rounded"
         />
         <button
           type="submit"
-          className="w-full p-2 text-black bg-blue-500 rounded hover:bg-blue-600"
+          className="w-full p-2 bg-blue-500 rounded hover:bg-blue-600"
         >
           Login
         </button>
