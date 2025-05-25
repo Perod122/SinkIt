@@ -48,3 +48,14 @@ export const signInAction = async (formData: FormData) => {
   // URL to redirect to after sign in process completes
   return redirect("/protected/home");
 }
+export const signOutAction = async () => {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    return encodedRedirect("error", "/protected/home", error.message);
+  }
+
+  // URL to redirect to after sign out process completes
+  return redirect("/login");
+}

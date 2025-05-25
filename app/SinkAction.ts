@@ -1,0 +1,44 @@
+"use server"
+
+import { createClient } from "@/utils/supabase/server";
+
+export const addSinking = async (formData: FormData) => {
+    const supabase = await createClient();
+    
+    // Get the current authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+        console.error("Error getting user:", userError);
+        throw new Error("User not authenticated");
+    }
+
+    const { data, error } = await supabase.from("sinking").insert({
+        owner_id: user.id,
+        start_date: formData.get("start_date"),
+        end_date: formData.get("end_date"),
+        payment_type: formData.get("payment_type") || "Monthly",
+        amount: parseFloat(formData.get("amount") as string),
+    });
+
+    if (error) {
+        console.error("Error adding sinking:", error);
+        throw new Error("Failed to add sinking");
+    }
+
+    return data;
+}
+
+export const getSinking = async () => {
+    const supabase = await createClient();
+    
+    // Get the current authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+        console.error("Error getting user:", userError);
+        throw new Error("User not authenticated");
+    }
+    const { data, error } = await supabase.from("sinking").select("*").eq("owner_id", user.id).order("created_at", { ascending: false });
+    return data;
+}
