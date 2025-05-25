@@ -78,18 +78,7 @@ const Navbar = () => {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-6">
-                        {/* Navigation Links */}
-                        <div className="flex items-center space-x-6">
-                            <Link href="/protected/home" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Home
-                            </Link>
-                            <Link href="/protected/products" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Products
-                            </Link>
-                            <Link href="/protected/dashboard" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                                Dashboard
-                            </Link>
-                        </div>
+                    
 
                         {/* User Dropdown */}
                         <div className="relative" ref={dropdownRef}>
@@ -147,27 +136,9 @@ const Navbar = () => {
                 {isMobileMenuOpen && (
                     <div className="md:hidden border-t border-gray-200/50 bg-white/95 backdrop-blur-lg">
                         <div className="px-2 pt-2 pb-3 space-y-1">
-                            <Link 
-                                href="/protected/home" 
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Home
-                            </Link>
-                            <Link 
-                                href="/protected/products" 
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Products
-                            </Link>
-                            <Link 
-                                href="/protected/dashboard" 
-                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors duration-200"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                Dashboard
-                            </Link>
+                         
+                           
+                
                             
                             {/* Mobile User Section */}
                             <div className="border-t border-gray-200 pt-3 mt-3">

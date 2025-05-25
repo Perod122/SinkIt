@@ -16,14 +16,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
         <Navbar/>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Sinking Fund Manager</h1>
-            <p className="text-gray-600 mb-6">
-              Plan and track your financial goals with organized sinking funds
-            </p>
-            <AddSinkingModal onSinkingAdded={handleSinkingAdded} />
-          </div>
+
           
           {/* Main Content */}
           <div className="space-y-8">
