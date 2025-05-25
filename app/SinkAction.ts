@@ -42,3 +42,12 @@ export const getSinking = async () => {
     const { data, error } = await supabase.from("sinking").select("*").eq("owner_id", user.id).order("created_at", { ascending: false });
     return data;
 }
+export const deleteSinking = async (id: string) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("sinking").delete().eq("id", id);
+    if (error) {
+        console.error("Error deleting sinking:", error);
+        throw new Error("Failed to delete sinking");
+    }
+    return data;
+}
