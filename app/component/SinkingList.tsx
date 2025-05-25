@@ -158,7 +158,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
         <h2 className="text-xl font-semibold text-gray-900">Your Sinking Funds</h2>
         <div className="flex items-center gap-4">
           <div className="text-sm text-gray-500">
-            {sinkingFunds.length} fund{sinkingFunds.length !== 1 ? 's' : ''}
+            {sinkingFunds.length} Sinking Fund{sinkingFunds.length !== 1 ? 's' : ''}
           </div>
           <button
             onClick={fetchSinkingFunds}
