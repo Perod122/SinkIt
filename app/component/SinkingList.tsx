@@ -3,6 +3,7 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'rea
 import { getSinking, deleteSinking } from '@/app/SinkAction'
 import { RefreshCcw, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 interface SinkingFund {
   id: string
@@ -18,6 +19,7 @@ export interface SinkingListRef {
 }
 
 const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
+  const router = useRouter()
   const [sinkingFunds, setSinkingFunds] = useState<SinkingFund[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -68,6 +70,14 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
   const handleDeleteCancel = () => {
     setShowDeleteModal(false)
     setFundToDelete(null)
+  }
+
+  const handleSinkingClick = (fund: SinkingFund, e: React.MouseEvent) => {
+    // Prevent click if clicking delete button
+    const target = e.target as HTMLElement
+    if (target.closest('button')) return
+    
+    router.push(`/protected/sink-details/${fund.id}`)
   }
 
   useImperativeHandle(ref, () => ({
@@ -216,13 +226,17 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
             return (
               <div
                 key={fund.id}
+                onClick={(e) => handleSinkingClick(fund, e)}
                 className={`bg-white rounded-lg shadow-md border-2 p-6 transition-all hover:shadow-lg relative ${
                   isCompleted ? 'border-green-200 bg-green-50' : 'border-gray-200 hover:border-blue-300'
-                } ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+                } ${isDeleting ? 'opacity-50 pointer-events-none' : ''} cursor-pointer`}
               >
                 {/* Delete Button */}
                 <button
-                  onClick={() => handleDeleteClick(fund)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleDeleteClick(fund)
+                  }}
                   disabled={isDeleting}
                   className="absolute top-3 right-3 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50"
                   title="Delete sinking fund"
