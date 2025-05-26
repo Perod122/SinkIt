@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { getSinkingById, getSinkingMembers, deleteSinkingMember } from '@/app/SinkAction'
-import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, Loader2, AlertCircle, PlusCircleIcon } from 'lucide-react'
+import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, Loader2, AlertCircle, PlusCircleIcon, HandCoins } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AddSinkingMember from '@/app/component/AddSinkingMember'
 import toast from 'react-hot-toast'
@@ -264,7 +264,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                           className="text-green-600 hover:text-green-900 transition-colors"
                           title="Add contribution"
                         >
-                          <PlusCircleIcon className="w-4 h-4" />
+                          <HandCoins className="w-6 h-6" />
                         </button>
                         <button
                           onClick={() => handleDeleteMember(member.id)}
@@ -272,7 +272,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                           className="text-red-600 hover:text-red-900 disabled:opacity-50 transition-colors"
                           title="Delete member"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-6 h-6" />
                         </button>
                       </td>
                     </tr>
