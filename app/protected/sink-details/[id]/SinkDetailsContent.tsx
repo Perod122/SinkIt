@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getSinkingById, getSinkingMembers, deleteSinkingMember } from '@/app/SinkAction'
+import { getSinkingById, getSinkingMembers, deleteSinkingMember, getTotalContributions } from '@/app/SinkAction'
 import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, Loader2, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AddSinkingMember from '@/app/component/AddSinkingMember'
@@ -34,6 +34,7 @@ const SinkDetailsContent = ({ id }: Props) => {
   const router = useRouter()
   const [fund, setFund] = useState<SinkingFund | null>(null)
   const [members, setMembers] = useState<SinkingMember[]>([])
+  const [totalContributions, setTotalContributions] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAddMember, setShowAddMember] = useState(false)
@@ -63,6 +64,11 @@ const SinkDetailsContent = ({ id }: Props) => {
         }
         setFund(fundData[0])
         await fetchMembers()
+        
+        // Fetch total contributions
+        const contributionsData = await getTotalContributions(id)
+        const total = (contributionsData || []).reduce((sum, contribution) => sum + contribution.amount, 0)
+        setTotalContributions(total)
       } catch (err) {
         setError('Failed to load sinking fund details')
         console.error('Error fetching sinking fund details:', err)
@@ -151,43 +157,66 @@ const SinkDetailsContent = ({ id }: Props) => {
       <div className="grid gap-6">
         {/* Fund Details Card */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Left Column - Amount and Payment Info */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <DollarSign className="w-8 h-8 text-green-600" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Fund Overview</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Amount Details */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-green-100 p-2 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900">Target Amount</h3>
+              </div>
+              <div className="space-y-4">
                 <div>
-                  <div className="text-sm text-gray-500">Total Amount</div>
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-sm text-gray-600 mb-1">Amount to pay</div>
+                  <div className="text-2xl font-bold text-gray-900">
                     ₱{fund.amount.toLocaleString()}
                   </div>
                 </div>
-              </div>
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-500 mb-1">Payment Method</div>
-                  <div className="font-medium text-gray-900">{fund.payment_type}</div>
+                <div className="pt-4 border-t border-green-200">
+                  <div className="text-sm text-gray-600 mb-1">Payment Method</div>
+                  <div className="text-base font-medium text-gray-900">{fund.payment_type}</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Dates */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <Calendar className="w-8 h-8 text-blue-600" />
+            {/* Progress Details */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-blue-100 p-2 rounded-lg">
+                  <DollarSign className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900">Total Accumulated</h3>
+              </div>
+              <div className="flex flex-col justify-center h-[calc(100%-3rem)]">
                 <div>
-                  <div className="text-sm text-gray-500">Timeline</div>
-                  <div className="text-lg font-medium text-gray-900">Payment Schedule</div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2">
+                    ₱{totalContributions.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Total contributions collected
+                  </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-500 mb-1">Start Date</div>
-                  <div className="font-medium text-gray-900">{formatDate(fund.start_date)}</div>
+            </div>
+
+            {/* Timeline Details */}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-purple-100 p-2 rounded-lg">
+                  <Calendar className="w-6 h-6 text-purple-600" />
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-sm text-gray-500 mb-1">End Date</div>
-                  <div className="font-medium text-gray-900">{formatDate(fund.end_date)}</div>
+                <h3 className="text-base font-semibold text-gray-900">Timeline</h3>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm text-gray-600 mb-1">Start Date</div>
+                  <div className="text-base font-medium text-gray-900">{formatDate(fund.start_date)}</div>
+                </div>
+                <div className="pt-4 border-t border-purple-200">
+                  <div className="text-sm text-gray-600 mb-1">End Date</div>
+                  <div className="text-base font-medium text-gray-900">{formatDate(fund.end_date)}</div>
                 </div>
               </div>
             </div>
@@ -237,6 +266,9 @@ const SinkDetailsContent = ({ id }: Props) => {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Added
                     </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Amount to pay
+                    </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
@@ -258,6 +290,11 @@ const SinkDetailsContent = ({ id }: Props) => {
                           {formatDate(member.created_at)}
                         </div>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          {member.count * fund.amount}
+                        </div>
+                      </td>
                       <td className="px-6 space-x-2 py-4 whitespace-nowrap text-right">
                         <button
                           onClick={() => handleAddContribution(member)}
@@ -267,8 +304,11 @@ const SinkDetailsContent = ({ id }: Props) => {
                           <HandCoins className="w-6 h-6" />
                         </button>
                         <button
-                        className="text-cyan-600 hover:text-cyan-900 transition-colors">
-                            <EyeIcon className="w-6 h-6" />
+                          onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
+                          className="text-cyan-600 hover:text-cyan-900 transition-colors"
+                          title="View contributions"
+                        >
+                          <EyeIcon className="w-6 h-6" />
                         </button>
                         <button
                           onClick={() => handleDeleteMember(member.id)}

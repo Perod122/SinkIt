@@ -146,3 +146,9 @@ export const getContributions = async (memberId: string, sinkId: string) => {
 
     return data;
 }
+
+export const getTotalContributions = async (sinkId: string) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("contributions").select("*").eq("sink_term", sinkId);
+    return data;
+}
