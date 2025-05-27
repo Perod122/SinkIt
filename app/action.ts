@@ -2,14 +2,13 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { encodedRedirect } from "@/utils/utils";
 import { headers } from "next/headers";
 
 export const signUpAction = async (formData: FormData) => {
     const email = formData.get("email")?.toString();
     const password = formData.get("password")?.toString();
     if (!email || !password) {
-      return encodedRedirect("error", "/signup", "Email and password are required.");
+      return { error: "Email and password are required." };
     }
     const supabase = await createClient();
     const origin = (await headers()).get("origin");
@@ -23,12 +22,10 @@ export const signUpAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect("error", "/signup", error.message);
-  } else {
-    return encodedRedirect("success", "/login", "Sign up successful.");
+    return { error: error.message };
   }
 
-  // URL to redirect to after sign up process completes
+  return redirect("/login");
 };
 
 export const signInAction = async (formData: FormData) => {
@@ -42,20 +39,19 @@ export const signInAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect("error", "/login", error.message);
+    return { error: error.message };
   }
 
-  // URL to redirect to after sign in process completes
   return redirect("/protected/home");
 }
+
 export const signOutAction = async () => {
   const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return encodedRedirect("error", "/protected/home", error.message);
+    return { error: error.message };
   }
 
-  // URL to redirect to after sign out process completes
   return redirect("/login");
 }

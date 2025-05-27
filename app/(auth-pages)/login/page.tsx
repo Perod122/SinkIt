@@ -1,11 +1,33 @@
+'use client';
+
 import { signInAction } from "@/app/action";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
+type ActionResult = { error: string } | undefined;
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  async function handleSubmit(formData: FormData) {
+    try {
+      const result = await signInAction(formData) as ActionResult;
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Successfully signed in!");
+        router.push("/protected/home");
+      }
+    } catch (error) {
+      toast.error("An error occurred during sign in");
+    }
+  }
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <h1 className="text-4xl font-bold">Login</h1>
       <form
-        action={signInAction}
+        action={handleSubmit}
         className="flex flex-col items-center justify-center w-full max-w-sm p-4 space-y-4"
       >
         <input
@@ -20,11 +42,11 @@ export default function LoginPage() {
           name="password"
           placeholder="Password"
           required
-          className="w-full p-2  text-black border border-gray-300 rounded"
+          className="w-full p-2 text-black border border-gray-300 rounded"
         />
         <button
           type="submit"
-          className="w-full p-2 bg-blue-500 rounded hover:bg-blue-600"
+          className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Login
         </button>
