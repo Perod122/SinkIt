@@ -96,7 +96,11 @@ export const getSinkingMembers = async (sinkId: string) => {
 
     return data;
 }
-
+export const getSinkingMemberById = async (memberId: string) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("sink_members").select("*").eq("id", memberId);
+    return data;
+}
 export const deleteSinkingMember = async (id: string) => {
     const supabase = await createClient();
     

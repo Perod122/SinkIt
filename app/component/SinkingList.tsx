@@ -209,7 +209,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
             <button
               onClick={fetchSinkingFunds}
               disabled={loading}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium disabled:opacity-50 transition-colors"
+              className="text-blue-600 hover:bg-blue-200 p-2 rounded-full hover:text-blue-800 text-sm font-medium disabled:opacity-50 transition-colors"
             >
               <RefreshCcw className="w-6 h-6" />
             </button>

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getContributions } from '@/app/SinkAction'
-import { ArrowLeft, Loader2, AlertCircle, Calendar, DollarSign } from 'lucide-react'
+import { getContributions, getSinkingMemberById } from '@/app/SinkAction'
+import { ArrowLeft, Loader2, AlertCircle, Calendar, DollarSign, User2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 
@@ -15,6 +15,12 @@ interface Contribution {
   sink_term: string
 }
 
+interface Member {
+  memberId: string
+  first_name: string
+  lastName: string | null
+}
+
 interface Props {
   sinkId: string
   memberId: string
@@ -23,6 +29,7 @@ interface Props {
 const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
   const router = useRouter()
   const [contributions, setContributions] = useState<Contribution[]>([])
+  const [member, setMember] = useState<Member[]>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,6 +38,8 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
       try {
         setLoading(true)
         setError(null)
+        const memberData = await getSinkingMemberById(memberId)
+        setMember(memberData || [])
         const data = await getContributions(memberId, sinkId)
         setContributions(data || [])
       } catch (err) {
@@ -94,7 +103,7 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center text-gray-600 hover:bg-gray-300 p-3 rounded-3xl hover:text-gray-800 font-medium gap-2"
+          className="inline-flex items-center text-gray-600 hover:bg-gray-300 p-3 rounded-full hover:text-gray-800 font-medium gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Fund Details
@@ -103,21 +112,38 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
 
       {/* Summary Card */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex items-center gap-3">
-            <DollarSign className="w-8 h-8 text-green-600" />
+            <div className="p-3 bg-green-50 rounded-full">
+              <User2Icon className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500">Member Name</div>
+              <div className="text-xl font-bold text-gray-900">
+                {member && member[0] ? `${member[0].first_name} ${member[0].lastName || ''}` : 'Unknown Member'}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="p-3 bg-blue-50 rounded-full">
+              <DollarSign className="w-6 h-6 text-blue-600" />
+            </div>
             <div>
               <div className="text-sm text-gray-500">Total Contributions</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-xl font-bold text-gray-900">
                 ₱{totalAmount.toLocaleString()}
               </div>
             </div>
           </div>
+
           <div className="flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-blue-600" />
+            <div className="p-3 bg-purple-50 rounded-full">
+              <Calendar className="w-6 h-6 text-purple-600" />
+            </div>
             <div>
               <div className="text-sm text-gray-500">Number of Contributions</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-xl font-bold text-gray-900">
                 {contributions.length}
               </div>
             </div>
