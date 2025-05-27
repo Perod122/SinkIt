@@ -128,6 +128,7 @@ const SinkDetailsContent = ({ id }: Props) => {
           <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-red-900 mb-2">Error Loading Fund</h3>
           <p className="text-red-600 mb-6">{error}</p>
+          //contri test
           <button
             onClick={() => router.back()}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
