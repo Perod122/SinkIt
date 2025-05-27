@@ -91,10 +91,10 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium gap-2"
+          className="inline-flex items-center text-gray-600 hover:bg-gray-300 p-3 rounded-3xl hover:text-gray-800 font-medium gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Fund Details

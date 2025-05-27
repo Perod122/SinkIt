@@ -247,7 +247,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4 pr-8">
                   <div className="flex-1">
-                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getPaymentTypeColor(fund.payment_type)}`}>
+                    <div className={`inline-flex px-2 py-1 rounded-full text-md font-medium ${getPaymentTypeColor(fund.payment_type)}`}>
                       {fund.payment_type}
                     </div>
                   </div>

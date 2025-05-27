@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react'
 import { getSinkingById, getSinkingMembers, deleteSinkingMember, getTotalContributions } from '@/app/SinkAction'
-import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, Loader2, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon } from 'lucide-react'
+import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AddSinkingMember from '@/app/component/AddSinkingMember'
+import LoadingSpinner from '@/app/component/LoadingSpinner'
 import toast from 'react-hot-toast'
 import AddContribution from '@/app/component/AddContribution'
 
@@ -111,13 +112,12 @@ const SinkDetailsContent = ({ id }: Props) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">Loading Fund Details</h3>
-          <p className="text-sm text-gray-500">Please wait...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        title="Loading Fund Details"
+        description="Please wait while we fetch your fund information"
+        className="min-h-screen"
+        size="lg"
+      />
     )
   }
 
@@ -143,10 +143,10 @@ const SinkDetailsContent = ({ id }: Props) => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center text-gray-600 hover:text-gray-800 font-medium gap-2"
+          className="inline-flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-300 p-3 rounded-3xl font-medium gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Sinking Funds
@@ -176,7 +176,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                 </div>
                 <div className="pt-4 border-t border-green-200">
                   <div className="text-sm text-gray-600 mb-1">Payment Method</div>
-                  <div className="text-base font-medium text-gray-900">{fund.payment_type}</div>
+                  <div className="text-xl font-bold text-gray-900">{fund.payment_type}</div>
                 </div>
               </div>
             </div>
@@ -189,14 +189,25 @@ const SinkDetailsContent = ({ id }: Props) => {
                 </div>
                 <h3 className="text-base font-semibold text-gray-900">Total Accumulated</h3>
               </div>
-              <div className="flex flex-col justify-center h-[calc(100%-3rem)]">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Total contributions collected
+                  </div>
+              <div className="flex flex-col justify-center">
                 <div>
                   <div className="text-3xl font-bold text-gray-900 mb-2">
                     ₱{totalContributions.toLocaleString()}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    Total contributions collected
+                </div>
+                <div className="pt-4 border-t border-green-200">
+                  <div className="text-sm text-gray-600 mb-1">Members</div>
+                  <div className="flex items-center gap-2">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                  <Users className="w-6 h-6 text-blue-600 " />
                   </div>
+                  <div className="text-xl font-bold text-gray-900 mb-2">
+                  {members.length}
+                </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -212,11 +223,11 @@ const SinkDetailsContent = ({ id }: Props) => {
               <div className="space-y-4">
                 <div>
                   <div className="text-sm text-gray-600 mb-1">Start Date</div>
-                  <div className="text-base font-medium text-gray-900">{formatDate(fund.start_date)}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatDate(fund.start_date)}</div>
                 </div>
                 <div className="pt-4 border-t border-purple-200">
                   <div className="text-sm text-gray-600 mb-1">End Date</div>
-                  <div className="text-base font-medium text-gray-900">{formatDate(fund.end_date)}</div>
+                  <div className="text-xl font-bold text-gray-900">{formatDate(fund.end_date)}</div>
                 </div>
               </div>
             </div>
@@ -230,9 +241,7 @@ const SinkDetailsContent = ({ id }: Props) => {
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-gray-900">Members</h2>
-                <span className="ml-2 text-sm text-gray-500">
-                  ({members.length} {members.length === 1 ? 'member' : 'members'})
-                </span>
+                
               </div>
               <button
                 onClick={() => setShowAddMember(true)}
@@ -253,76 +262,131 @@ const SinkDetailsContent = ({ id }: Props) => {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Name
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Count
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Added
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount to pay
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {members.map((member) => (
-                    <tr key={member.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {member.first_name} {member.lastName}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{member.count || 0}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {formatDate(member.created_at)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {member.count * fund.amount}
-                        </div>
-                      </td>
-                      <td className="px-6 space-x-2 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={() => handleAddContribution(member)}
-                          className="text-green-600 hover:text-green-900 transition-colors"
-                          title="Add contribution"
-                        >
-                          <HandCoins className="w-6 h-6" />
-                        </button>
-                        <button
-                          onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
-                          className="text-cyan-600 hover:text-cyan-900 transition-colors"
-                          title="View contributions"
-                        >
-                          <EyeIcon className="w-6 h-6" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteMember(member.id)}
-                          disabled={deletingMemberId === member.id}
-                          className="text-red-600 hover:text-red-900 disabled:opacity-50 transition-colors"
-                          title="Delete member"
-                        >
-                          <Trash2 className="w-6 h-6" />
-                        </button>
-                      </td>
+            <div>
+              {/* Desktop view */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Count
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Added
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Amount to pay
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {members.map((member) => (
+                      <tr key={member.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {member.first_name} {member.lastName}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{member.count || 0}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {formatDate(member.created_at)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            ₱{(member.count * fund.amount).toLocaleString()}
+                          </div>
+                        </td>
+                        <td className="px-6 space-x-2 py-4 whitespace-nowrap text-right">
+                          <button
+                            onClick={() => handleAddContribution(member)}
+                            className="text-green-600 hover:text-green-900 transition-colors"
+                            title="Add contribution"
+                          >
+                            <HandCoins className="w-6 h-6" />
+                          </button>
+                          <button
+                            onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
+                            className="text-cyan-600 hover:text-cyan-900 transition-colors"
+                            title="View contributions"
+                          >
+                            <EyeIcon className="w-6 h-6" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMember(member.id)}
+                            disabled={deletingMemberId === member.id}
+                            className="text-red-600 hover:text-red-900 disabled:opacity-50 transition-colors"
+                            title="Delete member"
+                          >
+                            <Trash2 className="w-6 h-6" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile view */}
+              <div className="md:hidden space-y-4 px-4 py-2">
+                {members.map((member) => (
+                  <div key={member.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          {member.first_name} {member.lastName}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">Added {formatDate(member.created_at)}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-xs text-gray-500">Count</p>
+                        <p className="text-sm font-medium text-gray-900">{member.count || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Amount to pay</p>
+                        <p className="text-sm font-medium text-gray-900">₱{(member.count * fund.amount).toLocaleString()}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-4 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => handleAddContribution(member)}
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-green-600"
+                        title="Add contribution"
+                      >
+                        <HandCoins className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-cyan-50 text-cyan-600"
+                        title="View contributions"
+                      >
+                        <EyeIcon className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMember(member.id)}
+                        disabled={deletingMemberId === member.id}
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 text-red-600 disabled:opacity-50"
+                        title="Delete member"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

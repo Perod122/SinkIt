@@ -8,12 +8,11 @@ interface Props {
   }
 }
 
-const SinkDetails = ({ params }: Props) => {
-  const id = React.use(Promise.resolve(params.id))
+async function SinkDetails({ params }: Props) {
   return (
     <>
       <Navbar />
-      <SinkDetailsContent id={id} />
+      <SinkDetailsContent id={params.id} />
     </>
   )
 }
