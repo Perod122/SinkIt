@@ -14,12 +14,17 @@ export default function LoginPage() {
       const result = await signInAction(formData) as ActionResult;
       if (result?.error) {
         toast.error(result.error);
-      } else {
+      } 
+    } catch (error: any) {
+      // Check if this is a redirect
+      if (error?.digest?.includes('NEXT_REDIRECT')) {
+        // This is a successful login with redirect
         toast.success("Successfully signed in!");
-        router.push("/protected/home");
+        return;
       }
-    } catch (error) {
+      // If it's not a redirect, it's a real error
       toast.error("An error occurred during sign in");
+      console.error('Login error:', error);
     }
   }
 

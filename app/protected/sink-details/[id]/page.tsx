@@ -9,10 +9,11 @@ interface Props {
 }
 
 async function SinkDetails({ params }: Props) {
+  const {id} = await params
   return (
     <>
       <Navbar />
-      <SinkDetailsContent id={params.id} />
+      <SinkDetailsContent id={id} />
     </>
   )
 }

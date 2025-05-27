@@ -8,11 +8,14 @@ interface Props {
   }
 }
 
-export default function MemberContributionsPage({ params }: Props) {
+async function MemberContributionsPage({ params }: Props) {
+  const {id, memberId} = await params
   return (
     <>
       <Navbar />
-      <MemberContributionsContent sinkId={params.id} memberId={params.memberId} />
+      <MemberContributionsContent sinkId={id} memberId={memberId} />
     </>
   )
 } 
+
+export default MemberContributionsPage
