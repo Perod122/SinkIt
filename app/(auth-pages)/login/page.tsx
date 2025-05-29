@@ -31,6 +31,12 @@ export default function LoginPage() {
     }
   }
 
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    await handleSubmit(formData);
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
@@ -46,7 +52,7 @@ export default function LoginPage() {
             </p>
           </div>
         <form
-          action={handleSubmit}
+          onSubmit={handleFormSubmit}
           className="space-y-6"
         >
           <div className="space-y-4">

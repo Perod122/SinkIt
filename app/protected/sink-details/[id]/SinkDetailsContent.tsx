@@ -91,8 +91,11 @@ const SinkDetailsContent = ({ id }: Props) => {
 
     try {
       setDeletingMemberId(memberId)
-      await deleteSinkingMember(memberId)
-      toast.success('Member deleted successfully')
+      toast.promise(deleteSinkingMember(memberId), {
+        loading: 'Deleting member...',
+        success: 'Member deleted successfully',
+        error: 'Failed to delete member'
+      })
       await fetchMembers()
     } catch (error) {
       console.error('Error deleting member:', error)

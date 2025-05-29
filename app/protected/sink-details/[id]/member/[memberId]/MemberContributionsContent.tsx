@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { getContributions, getSinkingMemberById } from '@/app/SinkAction'
-import { ArrowLeft, Loader2, AlertCircle, Calendar, DollarSign, User2Icon } from 'lucide-react'
+import { ArrowLeft, Loader2, AlertCircle, Calendar, DollarSign, User2Icon, PhilippinePeso } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import LoadingSpinner from '@/app/component/LoadingSpinner'
@@ -127,7 +127,7 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
 
           <div className="flex items-center gap-3">
             <div className="p-3 bg-blue-50 rounded-full">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+              <PhilippinePeso className="w-6 h-6 text-blue-600" />
             </div>
             <div>
               <div className="text-sm text-gray-500">Total Contributions</div>
@@ -159,7 +159,7 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
 
         {contributions.length === 0 ? (
           <div className="text-center py-12">
-            <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <PhilippinePeso className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <h3 className="text-sm font-medium text-gray-900">No Contributions Yet</h3>
             <p className="text-sm text-gray-500 mt-1">
               This member hasn't made any contributions yet

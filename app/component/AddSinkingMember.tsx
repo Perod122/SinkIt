@@ -22,8 +22,13 @@ const AddSinkingMember = ({ sinkId, onClose, onSuccess }: Props) => {
       const formData = new FormData(e.currentTarget)
       formData.append('sink_id', sinkId)
       
-      await addSinkingMember(formData)
-      toast.success('Member added successfully')
+      // await addSinkingMember(formData)
+      // toast.success('Member added successfully')
+      toast.promise(addSinkingMember(formData), {
+        loading: 'Adding member...',
+        success: 'Member added successfully',
+        error: 'Failed to add member'
+      })
       onSuccess()
       onClose()
     } catch (error) {
@@ -57,7 +62,7 @@ const AddSinkingMember = ({ sinkId, onClose, onSuccess }: Props) => {
               id="first_name"
               name="first_name"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter first name"
             />
           </div>
@@ -70,7 +75,7 @@ const AddSinkingMember = ({ sinkId, onClose, onSuccess }: Props) => {
               type="text"
               id="lastName"
               name="lastName"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter last name"
             />
           </div>
@@ -84,7 +89,7 @@ const AddSinkingMember = ({ sinkId, onClose, onSuccess }: Props) => {
               id="count"
               name="count"
               min="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter count"
             />
           </div>
@@ -102,7 +107,7 @@ const AddSinkingMember = ({ sinkId, onClose, onSuccess }: Props) => {
               disabled={loading}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Adding...' : 'Add Member'}
+             Add Member
             </button>
           </div>
         </form>
