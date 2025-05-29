@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { getSinkingById, getSinkingMembers, deleteSinkingMember, getTotalContributions } from '@/app/SinkAction'
-import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon } from 'lucide-react'
+import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon, Search, ChevronLeft, ChevronRight, PhilippinePeso } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AddSinkingMember from '@/app/component/AddSinkingMember'
 import LoadingSpinner from '@/app/component/LoadingSpinner'
@@ -42,6 +42,11 @@ const SinkDetailsContent = ({ id }: Props) => {
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null)
   const [showAddContribution, setShowAddContribution] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SinkingMember | null>(null)
+  
+  // Search and pagination states
+  const [searchTerm, setSearchTerm] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
 
   const fetchMembers = async () => {
     try {
@@ -110,6 +115,27 @@ const SinkDetailsContent = ({ id }: Props) => {
     setShowAddContribution(true)
   }
 
+  // Filtered and paginated members
+  const filteredMembers = useMemo(() => {
+    return members.filter(member => {
+      const fullName = `${member.first_name} ${member.lastName || ''}`.toLowerCase()
+      return fullName.includes(searchTerm.toLowerCase())
+    })
+  }, [members, searchTerm])
+
+  const paginatedMembers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return filteredMembers.slice(startIndex, endIndex)
+  }, [filteredMembers, currentPage, itemsPerPage])
+
+  const totalPages = Math.ceil(filteredMembers.length / itemsPerPage)
+
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
   if (loading) {
     return (
       <LoadingSpinner 
@@ -164,7 +190,7 @@ const SinkDetailsContent = ({ id }: Props) => {
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-green-100 p-2 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                  <PhilippinePeso className="w-6 h-6 text-green-600" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900">Target Amount</h3>
               </div>
@@ -186,7 +212,7 @@ const SinkDetailsContent = ({ id }: Props) => {
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-blue-100 p-2 rounded-lg">
-                  <DollarSign className="w-6 h-6 text-blue-600" />
+                  <PhilippinePeso className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900">Total Accumulated</h3>
               </div>
@@ -238,29 +264,58 @@ const SinkDetailsContent = ({ id }: Props) => {
         {/* Members Section */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-600" />
                 <h2 className="text-lg font-semibold text-gray-900">Members</h2>
-                
+                <span className="text-sm text-gray-500">({filteredMembers.length} of {members.length})</span>
               </div>
-              <button
-                onClick={() => setShowAddMember(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <UserPlus className="w-4 h-4" />
-                Add Member
-              </button>
+              
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                {/* Search Input */}
+                <div className="relative flex-1 sm:flex-initial">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search members..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="text-gray-800 w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                
+                <button
+                  onClick={() => setShowAddMember(true)}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Add Member
+                </button>
+              </div>
             </div>
           </div>
 
-          {members.length === 0 ? (
+          {filteredMembers.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <h3 className="text-sm font-medium text-gray-900">No Members Yet</h3>
-              <p className="text-sm text-gray-500 mt-1">
-                Add members to start tracking contributions
-              </p>
+              {searchTerm ? (
+                <>
+                  <Search className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="text-sm font-medium text-gray-900">No Members Found</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Try adjusting your search terms
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="text-sm font-medium text-gray-900">No Members Yet</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Add members to start tracking contributions
+                  </p>
+                </>
+              )}
             </div>
           ) : (
             <div>
@@ -287,7 +342,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {members.map((member) => (
+                    {paginatedMembers.map((member) => (
                       <tr key={member.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
@@ -339,7 +394,7 @@ const SinkDetailsContent = ({ id }: Props) => {
 
               {/* Mobile view */}
               <div className="md:hidden space-y-4 px-4 py-2">
-                {members.map((member) => (
+                {paginatedMembers.map((member) => (
                   <div key={member.id} className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
@@ -388,6 +443,96 @@ const SinkDetailsContent = ({ id }: Props) => {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200 bg-gray-50">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                  
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Showing{' '}
+                        <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
+                        {' '}to{' '}
+                        <span className="font-medium">
+                          {Math.min(currentPage * itemsPerPage, filteredMembers.length)}
+                        </span>
+                        {' '}of{' '}
+                        <span className="font-medium">{filteredMembers.length}</span>
+                        {' '}results
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                          disabled={currentPage === 1}
+                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="sr-only">Previous</span>
+                          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                        
+                        {/* Page Numbers */}
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .filter(page => {
+                            if (totalPages <= 7) return true
+                            if (page === 1 || page === totalPages) return true
+                            if (page >= currentPage - 1 && page <= currentPage + 1) return true
+                            return false
+                          })
+                          .map((page, index, array) => {
+                            const showEllipsis = index > 0 && array[index - 1] !== page - 1
+                            return (
+                              <React.Fragment key={page}>
+                                {showEllipsis && (
+                                  <span className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                  </span>
+                                )}
+                                <button
+                                  onClick={() => setCurrentPage(page)}
+                                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                    currentPage === page
+                                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              </React.Fragment>
+                            )
+                          })}
+                        
+                        <button
+                          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                          disabled={currentPage === totalPages}
+                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <span className="sr-only">Next</span>
+                          <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

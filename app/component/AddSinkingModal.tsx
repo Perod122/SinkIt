@@ -50,10 +50,10 @@ const AddSinkingModal: React.FC<AddSinkingModalProps> = ({ onSinkingAdded }) => 
         <div className="fixed inset-0 min-h-screen w-screen overflow-y-auto bg-black/50 flex items-center justify-center z-10">
           <div className="relative bg-white rounded-lg p-6 w-full max-w-md m-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Add Sinking Fund</h2>
+              <h2 className="text-gray-800 text-xl font-semibold">Add Sinking Fund</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-full p-2"
               >
                 ✕
               </button>
@@ -69,7 +69,7 @@ const AddSinkingModal: React.FC<AddSinkingModalProps> = ({ onSinkingAdded }) => 
                   id="start_date"
                   name="start_date"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="text-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -82,7 +82,7 @@ const AddSinkingModal: React.FC<AddSinkingModalProps> = ({ onSinkingAdded }) => 
                   id="end_date"
                   name="end_date"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="text-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -93,8 +93,8 @@ const AddSinkingModal: React.FC<AddSinkingModalProps> = ({ onSinkingAdded }) => 
                 <select
                   id="payment_type"
                   name="payment_type"
-                  defaultValue="Monthly"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  defaultValue="Weekly"
+                  className="text-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="Monthly">Monthly</option>
                   <option value="Weekly">Weekly</option>
@@ -114,8 +114,8 @@ const AddSinkingModal: React.FC<AddSinkingModalProps> = ({ onSinkingAdded }) => 
                   step="0.01"
                   min="0"
                   required
-                  placeholder="0.00"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="100"
+                  className="text-gray-800 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 

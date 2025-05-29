@@ -325,7 +325,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
-                {formatCurrency(sinkingFunds.reduce((sum, fund) => sum + fund.amount, 0))}
+                ₱{sinkingFunds.reduce((sum, fund) => sum + fund.amount, 0)}
               </div>
               <div className="text-sm text-gray-600">Total Target</div>
             </div>

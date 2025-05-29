@@ -5,6 +5,7 @@ import { getContributions, getSinkingMemberById } from '@/app/SinkAction'
 import { ArrowLeft, Loader2, AlertCircle, Calendar, DollarSign, User2Icon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
+import LoadingSpinner from '@/app/component/LoadingSpinner'
 
 interface Contribution {
   id: string
@@ -66,13 +67,12 @@ const MemberContributionsContent = ({ sinkId, memberId }: Props) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">Loading Contributions</h3>
-          <p className="text-sm text-gray-500">Please wait...</p>
-        </div>
-      </div>
+      <LoadingSpinner 
+        title="Loading Contributions"
+        description="Please wait while we fetch your contributions"
+        className="min-h-screen"
+        size="lg"
+      />
     )
   }
 
