@@ -3,7 +3,6 @@ import Navbar from '@/app/component/Navbar'
 import AddSinkingModal from '@/app/component/AddSinkingModal'
 import SinkingList, { SinkingListRef } from '@/app/component/SinkingList'
 import React, { useRef } from 'react'
-import { Toaster } from 'react-hot-toast'
 
 const Home = () => {
   const sinkingListRef = useRef<SinkingListRef>(null)
@@ -23,17 +22,7 @@ const Home = () => {
             <SinkingList ref={sinkingListRef} />
           </div>
           
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#fff',
-                color: '#333',
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-              },
-            }}
-          />
+          
         </div>
     </div>
   )

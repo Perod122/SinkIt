@@ -27,6 +27,14 @@ interface SinkingMember {
   created_at: string
 }
 
+interface Contribution {
+  id: string
+  contri_id: string
+  amount: number
+  date_paid: string
+  sink_term: string
+}
+
 interface Props {
   id: string
 }
@@ -47,6 +55,10 @@ const SinkDetailsContent = ({ id }: Props) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
+
+  const calculateTotalContributions = (contributions: Contribution[]) => {
+    return contributions.reduce((sum, contribution) => sum + contribution.amount, 0)
+  }
 
   const fetchMembers = async () => {
     try {
@@ -73,7 +85,7 @@ const SinkDetailsContent = ({ id }: Props) => {
         
         // Fetch total contributions
         const contributionsData = await getTotalContributions(id)
-        const total = (contributionsData || []).reduce((sum, contribution) => sum + contribution.amount, 0)
+        const total = calculateTotalContributions(contributionsData || [])
         setTotalContributions(total)
       } catch (err) {
         setError('Failed to load sinking fund details')
@@ -560,7 +572,15 @@ const SinkDetailsContent = ({ id }: Props) => {
             setShowAddContribution(false)
             setSelectedMember(null)
           }}
-          onSuccess={fetchMembers}
+          onSuccess={(totalContributionsData) => {
+            fetchMembers()
+            
+            // Update total contributions immediately if data is provided
+            if (totalContributionsData) {
+              const total = calculateTotalContributions(totalContributionsData)
+              setTotalContributions(total)
+            }
+          }}
         />
       )}
     </div>

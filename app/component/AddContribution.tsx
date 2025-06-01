@@ -1,21 +1,29 @@
 'use client'
 
 import React, { useState } from 'react'
-import { addContribution } from '@/app/SinkAction'
+import { addContribution, getTotalContributions } from '@/app/SinkAction'
 import { X } from 'lucide-react'
 import toast from 'react-hot-toast'
+
+interface Contribution {
+  id: string
+  contri_id: string
+  amount: number
+  date_paid: string
+  sink_term: string
+}
 
 interface Props {
   memberId: string
   sinkId: string
   memberName: string
   onClose: () => void
-  onSuccess: () => void
+  onSuccess: (totalContributions?: Contribution[]) => void
 }
 
 const AddContribution = ({ memberId, sinkId, memberName, onClose, onSuccess }: Props) => {
   const [loading, setLoading] = useState(false)
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -25,9 +33,9 @@ const AddContribution = ({ memberId, sinkId, memberName, onClose, onSuccess }: P
       formData.append('contri_id', memberId)
       formData.append('sink_term', sinkId)
       
-      await addContribution(formData)
+      const result = await addContribution(formData)
       toast.success('Contribution added successfully')
-      onSuccess()
+      onSuccess(result.totalContributions || undefined)
       onClose()
     } catch (error) {
       console.error('Error adding contribution:', error)

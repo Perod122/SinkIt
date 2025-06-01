@@ -76,8 +76,12 @@ export const addSinkingMember = async (formData: FormData) => {
         console.error("Error adding sinking member:", error);
         throw new Error("Failed to add sinking member");
     }
+    const totalMember = await getSinkingMembers(formData.get("sink_id") as string);
 
-    return data;
+    return {
+        member: data,
+        totalMember
+    };
 }
 
 export const getSinkingMembers = async (sinkId: string) => {
@@ -129,8 +133,14 @@ export const addContribution = async (formData: FormData) => {
         console.error("Error adding contribution:", error);
         throw new Error("Failed to add contribution");
     }
-
-    return data;
+    
+    // Fetch and return total contributions after adding
+    const totalContributions = await getTotalContributions(formData.get("sink_term") as string);
+    
+    return {
+        contribution: data,
+        totalContributions
+    };
 }
 
 export const getContributions = async (memberId: string, sinkId: string) => {
