@@ -81,7 +81,7 @@ const AddContribution = ({ memberId, sinkId, memberName, onClose, onSuccess }: P
                 required
                 min="0"
                 step="0.01"
-                className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="text-black w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0.00"
               />
             </div>
@@ -95,7 +95,7 @@ const AddContribution = ({ memberId, sinkId, memberName, onClose, onSuccess }: P
               type="datetime-local"
               id="date_paid"
               name="date_paid"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
