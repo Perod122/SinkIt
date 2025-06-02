@@ -15,6 +15,7 @@ interface SinkingFund {
   end_date: string
   payment_type: string
   amount: number
+  status?: string
   created_at?: string
 }
 

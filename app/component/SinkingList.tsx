@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react'
-import { getSinking, deleteSinking } from '@/app/SinkAction'
-import { RefreshCcw, Trash2 } from 'lucide-react'
+import { getSinking, deleteSinking, completedSinking, getActiveSinking } from '@/app/SinkAction'
+import { RefreshCcw, Trash2, CheckCircle, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 
@@ -11,6 +11,7 @@ interface SinkingFund {
   end_date: string
   payment_type: string
   amount: number
+  status?: string
   created_at?: string
 }
 
@@ -24,14 +25,16 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [completingId, setCompletingId] = useState<string | null>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [fundToDelete, setFundToDelete] = useState<SinkingFund | null>(null)
+  const [showCompletedFunds, setShowCompletedFunds] = useState(false)
 
   const fetchSinkingFunds = async () => {
     try {
       setLoading(true)
       setError(null)
-      const data = await getSinking()
+      const data = showCompletedFunds ? await getSinking() : await getActiveSinking()
       setSinkingFunds(data || [])
     } catch (err) {
       setError('Failed to load sinking funds')
@@ -44,6 +47,36 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
   const handleDeleteClick = (fund: SinkingFund) => {
     setFundToDelete(fund)
     setShowDeleteModal(true)
+  }
+
+  const handleCompleteClick = async (fund: SinkingFund, e: React.MouseEvent) => {
+    e.stopPropagation()
+    
+    if (fund.status === 'completed') {
+      toast.success('This sinking fund is already completed')
+      return
+    }
+
+    try {
+      setCompletingId(fund.id)
+      await completedSinking(fund.id)
+      
+      // Update the local state to reflect the completion
+      setSinkingFunds(prev => 
+        prev.map(f => 
+          f.id === fund.id 
+            ? { ...f, status: 'completed' }
+            : f
+        )
+      )
+      
+      toast.success('Sinking fund marked as completed!')
+    } catch (error) {
+      console.error('Error completing sinking fund:', error)
+      toast.error('Failed to complete sinking fund')
+    } finally {
+      setCompletingId(null)
+    }
   }
 
   const handleDeleteConfirm = async () => {
@@ -86,7 +119,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
 
   useEffect(() => {
     fetchSinkingFunds()
-  }, [])
+  }, [showCompletedFunds])
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -203,9 +236,24 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">Your Sinking Funds</h2>
           <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 hidden md:block">
               {sinkingFunds.length} Sinking Fund{sinkingFunds.length !== 1 ? 's' : ''}
+              {!showCompletedFunds && (
+                <span className="text-blue-600 font-medium"> (Active Only)</span>
+              )}
             </div>
+            <button
+              onClick={() => setShowCompletedFunds(!showCompletedFunds)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                showCompletedFunds 
+                  ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+              }`}
+              title={showCompletedFunds ? 'Hide completed funds' : 'Show completed funds'}
+            >
+              {showCompletedFunds ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {showCompletedFunds ? 'Hide Completed' : 'Show All'}
+            </button>
             <button
               onClick={fetchSinkingFunds}
               disabled={loading}
@@ -220,8 +268,9 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
           {sinkingFunds.map((fund) => {
             const progress = calculateProgress(fund.start_date, fund.end_date)
             const daysRemaining = getDaysRemaining(fund.end_date)
-            const isCompleted = progress >= 100
+            const isCompleted = progress >= 100 || fund.status === "completed"
             const isDeleting = deletingId === fund.id
+            const isCompleting = completingId === fund.id
 
             return (
               <div
@@ -229,30 +278,45 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
                 onClick={(e) => handleSinkingClick(fund, e)}
                 className={`bg-white rounded-lg shadow-md border-2 p-6 transition-all hover:shadow-lg relative ${
                   isCompleted ? 'border-green-200 bg-green-50' : 'border-gray-200 hover:border-blue-300'
-                } ${isDeleting ? 'opacity-50 pointer-events-none' : ''} cursor-pointer`}
+                } ${isDeleting || isCompleting ? 'opacity-50 pointer-events-none' : ''} cursor-pointer`}
               >
-                {/* Delete Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDeleteClick(fund)
-                  }}
-                  disabled={isDeleting}
-                  className="absolute top-3 right-3 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50"
-                  title="Delete sinking fund"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Action Buttons */}
+                <div className="absolute top-3 right-3 flex gap-1">
+                  {!isCompleted && (
+                    <button
+                      onClick={(e) => handleCompleteClick(fund, e)}
+                      disabled={isCompleting || isDeleting}
+                      className="p-2 text-green-500 hover:text-green-700 hover:bg-green-50 rounded-full transition-all duration-200 disabled:opacity-50"
+                      title="Mark as completed"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteClick(fund)
+                    }}
+                    disabled={isDeleting || isCompleting}
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all duration-200 disabled:opacity-50"
+                    title="Delete sinking fund"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
 
                 {/* Header */}
-                <div className="flex items-start justify-between mb-4 pr-8">
+                <div className="flex items-start justify-between mb-4 pr-16">
                   <div className="flex-1">
                     <div className={`inline-flex px-2 py-1 rounded-full text-md font-medium ${getPaymentTypeColor(fund.payment_type)}`}>
                       {fund.payment_type}
                     </div>
                   </div>
                   {isCompleted && (
-                    <div className="text-green-600 text-xl">✓</div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-green-600 text-xl">✓</span>
+                      <span className="text-xs font-medium text-green-600">COMPLETED</span>
+                    </div>
                   )}
                 </div>
 
@@ -283,7 +347,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-gray-500">Progress</span>
                     <span className={`font-medium ${isCompleted ? 'text-green-600' : 'text-blue-600'}`}>
-                      {progress}%
+                      {Math.min(progress, 100)}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -305,7 +369,7 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
                       ? 'bg-red-100 text-red-800'
                       : 'bg-gray-100 text-gray-800'
                   }`}>
-                    {daysRemaining}
+                    {isCompleted ? 'Completed' : daysRemaining}
                   </span>
                 </div>
               </div>
@@ -313,36 +377,6 @@ const SinkingList = forwardRef<SinkingListRef>((props, ref) => {
           })}
         </div>
 
-        {/* Summary Statistics */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">Summary</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {sinkingFunds.length}
-              </div>
-              <div className="text-sm text-gray-600">Total Funds</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                ₱{sinkingFunds.reduce((sum, fund) => sum + fund.amount, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Total Target</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
-                {sinkingFunds.filter(fund => calculateProgress(fund.start_date, fund.end_date) >= 100).length}
-              </div>
-              <div className="text-sm text-gray-600">Completed</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">
-                {sinkingFunds.filter(fund => calculateProgress(fund.start_date, fund.end_date) < 100).length}
-              </div>
-              <div className="text-sm text-gray-600">Active</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

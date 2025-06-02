@@ -39,9 +39,97 @@ export const getSinking = async () => {
         console.error("Error getting user:", userError);
         throw new Error("User not authenticated");
     }
-    const { data, error } = await supabase.from("sinking").select("*").eq("owner_id", user.id).order("created_at", { ascending: false });
+    
+    // First, get all sinking funds for the user
+    const { data, error } = await supabase
+        .from("sinking")
+        .select("*")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: false });
+    
+    if (error) {
+        console.error("Error getting sinking funds:", error);
+        throw new Error("Failed to get sinking funds");
+    }
+    
+    if (!data || data.length === 0) {
+        return data;
+    }
+    
+    // Check for sinking funds that should be automatically completed
+    const now = new Date();
+    const fundsToComplete = data.filter(fund => {
+        const endDate = new Date(fund.end_date);
+        return now > endDate && fund.status !== "completed";
+    });
+    
+    // Update status to "completed" for expired funds
+    if (fundsToComplete.length > 0) {
+        for (const fund of fundsToComplete) {
+            await supabase
+                .from("sinking")
+                .update({ status: "completed" })
+                .eq("id", fund.id);
+        }
+        
+        // Fetch updated data
+        const { data: updatedData, error: updateError } = await supabase
+            .from("sinking")
+            .select("*")
+            .eq("owner_id", user.id)
+            .order("created_at", { ascending: false });
+            
+        if (updateError) {
+            console.error("Error getting updated sinking funds:", updateError);
+            // Return original data if update fetch fails
+            return data;
+        }
+        
+        return updatedData;
+    }
+    
     return data;
 }
+
+// Utility function to check if a sinking fund should be completed
+export const shouldBeCompleted = async (endDate: string, currentStatus?: string) => {
+    const now = new Date();
+    const end = new Date(endDate);
+    return now > end && currentStatus !== "completed";
+}
+
+export const getActiveSinking = async () => {
+    const supabase = await createClient();
+    
+    // Get the current authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+        console.error("Error getting user:", userError);
+        throw new Error("User not authenticated");
+    }
+    
+    // First, get all sinking funds for the user (this will auto-update expired ones)
+    const allFunds = await getSinking();
+    
+    // Filter out completed funds
+    const activeFunds = allFunds?.filter(fund => fund.status !== "completed") || [];
+    
+    return activeFunds;
+}
+
+export const completedSinking = async (id: string) => {
+    const supabase = await createClient();
+    const { data, error } = await supabase.from("sinking").update({ status: "completed" }).eq("id", id);
+    
+    if (error) {
+        console.error("Error updating sinking status:", error);
+        throw new Error("Failed to update sinking status");
+    }
+    
+    return data;
+}
+
 export const deleteSinking = async (id: string) => {
     const supabase = await createClient();
     const { data, error } = await supabase.from("sinking").delete().eq("id", id);
@@ -59,6 +147,37 @@ export const getSinkingById = async (id: string) => {
         console.error("Error getting sinking by id:", error);
         throw new Error("Failed to get sinking by id");
     }
+    
+    if (!data || data.length === 0) {
+        return data;
+    }
+    
+    const fund = data[0];
+    const now = new Date();
+    const endDate = new Date(fund.end_date);
+    
+    // Check if the fund should be automatically completed
+    if (now > endDate && fund.status !== "completed") {
+        await supabase
+            .from("sinking")
+            .update({ status: "completed" })
+            .eq("id", id);
+            
+        // Fetch updated data
+        const { data: updatedData, error: updateError } = await supabase
+            .from("sinking")
+            .select("*")
+            .eq("id", id);
+            
+        if (updateError) {
+            console.error("Error getting updated sinking by id:", updateError);
+            // Return original data if update fetch fails
+            return data;
+        }
+        
+        return updatedData;
+    }
+    
     return data;
 }
 
@@ -100,11 +219,13 @@ export const getSinkingMembers = async (sinkId: string) => {
 
     return data;
 }
+
 export const getSinkingMemberById = async (memberId: string) => {
     const supabase = await createClient();
     const { data, error } = await supabase.from("sink_members").select("*").eq("id", memberId);
     return data;
 }
+
 export const deleteSinkingMember = async (id: string) => {
     const supabase = await createClient();
     
