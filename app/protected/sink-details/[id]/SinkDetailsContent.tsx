@@ -165,15 +165,14 @@ const SinkDetailsContent = ({ id }: Props) => {
 
   if (error || !fund) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="mt-28 flex items-center justify-center p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md w-full text-center">
           <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-red-900 mb-2">Error Loading Fund</h3>
           <p className="text-red-600 mb-6">{error}</p>
-          //contri test
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Return to Sinking Funds
