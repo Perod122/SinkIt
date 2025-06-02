@@ -2,10 +2,10 @@ import Navbar from "@/app/component/Navbar";
 import MemberContributionsContent from "././MemberContributionsContent";
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
     memberId: string
-  }
+  }>
 }
 
 async function MemberContributionsPage({ params }: Props) {

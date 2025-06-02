@@ -3,9 +3,9 @@ import SinkDetailsContent from './SinkDetailsContent'
 import Navbar from '@/app/component/Navbar'
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 async function SinkDetails({ params }: Props) {
