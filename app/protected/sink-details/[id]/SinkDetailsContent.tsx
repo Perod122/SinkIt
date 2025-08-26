@@ -8,6 +8,7 @@ import AddSinkingMember from '@/app/component/AddSinkingMember'
 import LoadingSpinner from '@/app/component/LoadingSpinner'
 import toast from 'react-hot-toast'
 import AddContribution from '@/app/component/AddContribution'
+import LendMoney from '@/app/component/LendMoney'
 
 interface SinkingFund {
   id: string
@@ -50,6 +51,7 @@ const SinkDetailsContent = ({ id }: Props) => {
   const [showAddMember, setShowAddMember] = useState(false)
   const [deletingMemberId, setDeletingMemberId] = useState<string | null>(null)
   const [showAddContribution, setShowAddContribution] = useState(false)
+  const [showLendMoney, setShowLendMoney] = useState(false)
   const [selectedMember, setSelectedMember] = useState<SinkingMember | null>(null)
   
   // Search and pagination states
@@ -235,9 +237,18 @@ const SinkDetailsContent = ({ id }: Props) => {
                     Total contributions collected
                   </div>
               <div className="flex flex-col justify-center">
-                <div>
+                <div className="flex justify-between">
                   <div className="text-3xl font-bold text-gray-900 mb-2">
                     ₱{totalContributions.toLocaleString()}
+                  </div>
+                  <div className="items-end text-end justify-end">
+                    <button 
+                      onClick={() => setShowLendMoney(true)}
+                      className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 transition-colors" 
+                      title="Lend Money"
+                    >
+                      <HandCoins className="w-6 h-6" />
+                    </button>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-green-200">
@@ -383,7 +394,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                             className="text-green-600 hover:text-green-900 transition-colors"
                             title="Add contribution"
                           >
-                            <HandCoins className="w-6 h-6" />
+                            <PlusCircleIcon className="w-6 h-6" />
                           </button>
                           <button
                             onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
@@ -437,7 +448,7 @@ const SinkDetailsContent = ({ id }: Props) => {
                         className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-green-600"
                         title="Add contribution"
                       >
-                        <HandCoins className="w-5 h-5" />
+                        <PlusCircleIcon className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => router.push(`/protected/sink-details/${id}/member/${member.id}`)}
@@ -580,6 +591,19 @@ const SinkDetailsContent = ({ id }: Props) => {
               const total = calculateTotalContributions(totalContributionsData)
               setTotalContributions(total)
             }
+          }}
+        />
+      )}
+
+      {/* Lend Money Modal */}
+      {showLendMoney && (
+        <LendMoney
+          sinkId={id}
+          members={members}
+          onClose={() => setShowLendMoney(false)}
+          onSuccess={() => {
+            toast.success('Loan recorded successfully')
+            // Additional success handling will go here
           }}
         />
       )}
