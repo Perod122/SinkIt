@@ -284,7 +284,7 @@ export const getContributions = async (memberId: string, sinkId: string) => {
 
 export const getTotalContributions = async (sinkId: string) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from("contributions").select("*").eq("sink_term", sinkId);
+    const { data } = await supabase.from("contributions").select("*").eq("sink_term", sinkId);
     return data;
 }
 
@@ -296,7 +296,7 @@ export const lendMoney = async (formData: FormData) => {
         interest: parseFloat(formData.get("interest") as string),
         Months: formData.get("Months"),
         payable: parseFloat(formData.get("payable") as string),
-        Brrwd_SinkingID: formData.get("sinkId"),
+        Brrwd_SinkingID: formData.get("Brrwd_SinkingID"),
     });
     if (error) {
         console.error("Error lending money:", error);
