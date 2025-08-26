@@ -21,7 +21,8 @@ const LendMoney: React.FC<LendMoneyProps> = ({ onClose, onSuccess, sinkId, membe
     amount: '',
     interest: '',
     Months: '1',
-    payable: ''
+    payable: '',
+    Brrwd_SinkingID: ''
   })
 
   // Calculate payable amount when amount, interest, or months changes
@@ -47,7 +48,8 @@ const LendMoney: React.FC<LendMoneyProps> = ({ onClose, onSuccess, sinkId, membe
       form.append('interest', formData.interest)
       form.append('Months', formData.Months) // This will only send the number
       form.append('payable', formData.payable.split(' ')[0].replace('₱', '')) // Remove ₱ symbol and everything after the amount
-
+      form.append('Brrwd_SinkingID', sinkId)
+    
       const response = await lendMoney(form)
       console.log('Loan recorded successfully:', response)
       onSuccess?.()
