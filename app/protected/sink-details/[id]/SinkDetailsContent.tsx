@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState, useMemo } from 'react'
-import { getSinkingById, getSinkingMembers, deleteSinkingMember, getTotalContributions } from '@/app/SinkAction'
+import { getSinkingById, getSinkingMembers, deleteSinkingMember, getTotalContributions, getTotalBorrowedMoney } from '@/app/SinkAction'
 import { ArrowLeft, Calendar, DollarSign, Users, Trash2, UserPlus, AlertCircle, PlusCircleIcon, HandCoins, EyeIcon, Search, ChevronLeft, ChevronRight, PhilippinePeso } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import AddSinkingMember from '@/app/component/AddSinkingMember'
@@ -37,6 +37,15 @@ interface Contribution {
   sink_term: string
 }
 
+interface Borrow {
+  id: string
+  borrower_id: string
+  amount: number
+  interest: number
+  Months: number
+  Brrwd_SinkingID: string
+}
+
 interface Props {
   id: string
 }
@@ -46,6 +55,7 @@ const SinkDetailsContent = ({ id }: Props) => {
   const [fund, setFund] = useState<SinkingFund | null>(null)
   const [members, setMembers] = useState<SinkingMember[]>([])
   const [totalContributions, setTotalContributions] = useState(0)
+  const [totalBorrowedMoney, setTotalBorrowedMoney] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showAddMember, setShowAddMember] = useState(false)
@@ -61,6 +71,10 @@ const SinkDetailsContent = ({ id }: Props) => {
 
   const calculateTotalContributions = (contributions: Contribution[]) => {
     return contributions.reduce((sum, contribution) => sum + contribution.amount, 0)
+  }
+
+  const calculateTotalBorrowed = (borrowedMoney: Borrow[]) => {
+    return borrowedMoney.reduce((sum, borrow) => sum + borrow.amount, 0)
   }
 
   const fetchMembers = async () => {
@@ -87,6 +101,11 @@ const SinkDetailsContent = ({ id }: Props) => {
         await fetchMembers()
         
         // Fetch total contributions
+        const borrowedMoneyData = await getTotalBorrowedMoney(id)
+        console.log('Borrowed Money Data:', borrowedMoneyData)
+        const totalBorrowed = calculateTotalBorrowed(borrowedMoneyData || [])
+        console.log('Total Borrowed Calculated:', totalBorrowed)
+        setTotalBorrowedMoney(totalBorrowed)
         const contributionsData = await getTotalContributions(id)
         const total = calculateTotalContributions(contributionsData || [])
         setTotalContributions(total)
@@ -100,7 +119,6 @@ const SinkDetailsContent = ({ id }: Props) => {
 
     fetchData()
   }, [id])
-
   const handleDeleteMember = async (memberId: string) => {
     if (!confirm('Are you sure you want to delete this member?')) return
 
@@ -238,8 +256,19 @@ const SinkDetailsContent = ({ id }: Props) => {
                   </div>
               <div className="flex flex-col justify-center">
                 <div className="flex justify-between">
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    ₱{totalContributions.toLocaleString()}
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-sm text-gray-600">Total Contributions</div>
+                      <div className="text-2xl font-bold text-gray-900">₱{totalContributions.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Total Borrowed</div>
+                      <div className="text-2xl font-bold text-red-600">₱{totalBorrowedMoney.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Available Balance</div>
+                      <div className="text-2xl font-bold text-green-600">₱{(totalContributions - totalBorrowedMoney).toLocaleString()}</div>
+                    </div>
                   </div>
                   <div className="items-end text-end justify-end">
                     <button 
@@ -601,9 +630,12 @@ const SinkDetailsContent = ({ id }: Props) => {
           sinkId={id}
           members={members}
           onClose={() => setShowLendMoney(false)}
-          onSuccess={() => {
+          onSuccess={async () => {
             toast.success('Loan recorded successfully')
-            // Additional success handling will go here
+            // Refresh borrowed amount
+            const borrowedMoneyData = await getTotalBorrowedMoney(id)
+            const totalBorrowed = calculateTotalBorrowed(borrowedMoneyData || [])
+            setTotalBorrowedMoney(totalBorrowed)
           }}
         />
       )}
