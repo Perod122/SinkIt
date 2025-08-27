@@ -288,16 +288,29 @@ export const getTotalContributions = async (sinkId: string) => {
     return data;
 }
 
+export const getTotalBorrowedMoney = async (sinkId: string) => {
+    const supabase = await createClient();
+    console.log('Searching for borrowed money with sinkId:', sinkId);
+    const { data, error } = await supabase.from("borrow").select("*").eq("Brrwd_SinkingID", sinkId);
+    if (error) {
+        console.error('Error fetching borrowed money:', error);
+    }
+    console.log('Retrieved borrowed money data:', data);
+    return data;
+}
+
 export const lendMoney = async (formData: FormData) => {
     const supabase = await createClient();
-    const { data, error } = await supabase.from("borrow").insert({
-        borrower_id: formData.get("borrower_id"),
+    const insertData = {
+        borrower_id: parseInt(formData.get("borrower_id") as string),
         amount: parseFloat(formData.get("amount") as string),
         interest: parseFloat(formData.get("interest") as string),
-        Months: formData.get("Months"),
+        Months: parseInt(formData.get("Months") as string),
         payable: parseFloat(formData.get("payable") as string),
         Brrwd_SinkingID: formData.get("Brrwd_SinkingID"),
-    });
+    };
+    console.log('Inserting borrow data:', insertData);
+    const { data, error } = await supabase.from("borrow").insert(insertData);
     if (error) {
         console.error("Error lending money:", error);
         throw new Error("Failed to lend money");
