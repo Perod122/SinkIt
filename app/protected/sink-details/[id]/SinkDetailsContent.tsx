@@ -258,7 +258,6 @@ const SinkDetailsContent = ({ id }: Props) => {
                 <div className="flex justify-between">
                   <div className="space-y-2">
                     <div>
-                      <div className="text-sm text-gray-600">Total Contributions</div>
                       <div className="text-2xl font-bold text-gray-900">₱{totalContributions.toLocaleString()}</div>
                     </div>
                     <div>
