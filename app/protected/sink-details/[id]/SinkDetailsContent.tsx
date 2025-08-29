@@ -251,25 +251,13 @@ const SinkDetailsContent = ({ id }: Props) => {
                 </div>
                 <h3 className="text-base font-semibold text-gray-900">Total Accumulated</h3>
               </div>
-                  <div className="text-sm text-gray-600 mb-1">
-                    Total contributions collected
-                  </div>
-              <div className="flex flex-col justify-center">
-                <div className="flex justify-between">
-                  <div className="space-y-2">
+              <div className="flex flex-col justify-center w-full">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center w-full">
                     <div>
+                      <div className="text-sm text-gray-600">Total Contributions</div>
                       <div className="text-2xl font-bold text-gray-900">₱{totalContributions.toLocaleString()}</div>
                     </div>
-                    <div>
-                      <div className="text-sm text-gray-600">Total Borrowed</div>
-                      <div className="text-2xl font-bold text-red-600">₱{totalBorrowedMoney.toLocaleString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-600">Available Balance</div>
-                      <div className="text-2xl font-bold text-green-600">₱{(totalContributions - totalBorrowedMoney).toLocaleString()}</div>
-                    </div>
-                  </div>
-                  <div className="items-end text-end justify-end">
                     <button 
                       onClick={() => setShowLendMoney(true)}
                       className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 transition-colors" 
@@ -277,6 +265,23 @@ const SinkDetailsContent = ({ id }: Props) => {
                     >
                       <HandCoins className="w-6 h-6" />
                     </button>
+                  </div>
+                  <div className="flex justify-between items-center w-full">
+                    <div>
+                      <div className="text-sm text-gray-600">Total Borrowed</div>
+                      <div className="text-2xl font-bold text-red-600">₱{totalBorrowedMoney.toLocaleString()}</div>
+                    </div>
+                    <button 
+                      className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600 transition-colors" 
+                      title="View Borrowed Money"
+                      onClick={() => router.push(`/protected/sink-details/${id}/borrowed-money`)}
+                    >
+                      <EyeIcon className="w-6 h-6" />
+                    </button>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Available Balance</div>
+                    <div className="text-2xl font-bold text-green-600">₱{(totalContributions - totalBorrowedMoney).toLocaleString()}</div>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-green-200">
