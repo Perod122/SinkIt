@@ -275,7 +275,6 @@ export const getContributions = async (memberId: string, sinkId: string) => {
         .order("date_paid", { ascending: false });
 
     if (error) {
-        console.error("Error getting contributions:", error);
         throw new Error("Failed to get contributions");
     }
 
@@ -295,7 +294,6 @@ export const getTotalBorrowedMoney = async (sinkId: string) => {
     if (error) {
         console.error('Error fetching borrowed money:', error);
     }
-    console.log('Retrieved borrowed money data:', data);
     return data;
 }
 
@@ -309,10 +307,8 @@ export const lendMoney = async (formData: FormData) => {
         payable: parseFloat(formData.get("payable") as string),
         Brrwd_SinkingID: formData.get("Brrwd_SinkingID"),
     };
-    console.log('Inserting borrow data:', insertData);
     const { data, error } = await supabase.from("borrow").insert(insertData);
     if (error) {
-        console.error("Error lending money:", error);
         throw new Error("Failed to lend money");
     }
     return data;
