@@ -290,7 +290,20 @@ export const getTotalContributions = async (sinkId: string) => {
 export const getTotalBorrowedMoney = async (sinkId: string) => {
     const supabase = await createClient();
     console.log('Searching for borrowed money with sinkId:', sinkId);
-    const { data, error } = await supabase.from("borrow").select("*").eq("Brrwd_SinkingID", sinkId);
+    
+    const { data, error } = await supabase
+        .from("borrow")
+        .select(`
+            *,
+            borrower:sink_members!borrower_id (
+                id,
+                first_name,
+                lastName
+            )
+        `)
+        .eq("Brrwd_SinkingID", sinkId)
+        .order("created_at", { ascending: false });
+    
     if (error) {
         console.error('Error fetching borrowed money:', error);
     }
