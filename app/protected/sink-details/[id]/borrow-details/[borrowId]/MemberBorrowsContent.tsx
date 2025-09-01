@@ -69,7 +69,7 @@ const MemberBorrowsContent = ({ sinkId, memberId, borrowId }: Props) => {
           id: borrowId,
           borrower_id: memberId,
           amount: 5000,
-          interest: 10,
+          interest: 20,
           pay_type: '3',
           payable: 1833.33,
           created_at: new Date().toISOString(),

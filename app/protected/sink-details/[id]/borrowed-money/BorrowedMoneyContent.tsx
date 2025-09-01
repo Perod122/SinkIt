@@ -68,7 +68,6 @@ const BorrowedMoneyContent = ({ sinkId }: Props) => {
         setBorrowRecords(borrowData || [])
       } catch (err) {
         setError('Failed to load borrowed money records')
-        console.error('Error fetching borrowed money:', err)
       } finally {
         setLoading(false)
       }
